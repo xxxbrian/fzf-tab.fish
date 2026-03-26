@@ -30,17 +30,24 @@ function _fifc_preview_file -d "Preview the selected file with the right tool de
             end
         case pdf
             if type -q pdftoppm
-                set -l preview_dir (mktemp -d)
-                set -l preview_base "$preview_dir/preview"
-                pdftoppm -f 1 -singlefile -png "$fifc_candidate" "$preview_base" >/dev/null 2>&1
-                if test -f "$preview_base.png"; and _fifc_preview_graphic "$preview_base.png"
+                set -l preview_png (_fifc_preview_cache_file "$fifc_candidate" pdf png)
+                if not test -f "$preview_png"
+                    set -l preview_dir (mktemp -d)
+                    set -l preview_base "$preview_dir/preview"
+                    pdftoppm -f 1 -singlefile -png "$fifc_candidate" "$preview_base" >/dev/null 2>&1
+                    if test -f "$preview_base.png"
+                        mv "$preview_base.png" "$preview_png"
+                    end
+                    rm -rf "$preview_dir"
+                end
+
+                if test -f "$preview_png"; and _fifc_preview_graphic "$preview_png"
                 else if type -q pdftotext
                     _fifc_clear_graphics
                     pdftotext -l 10 -nopgbrk "$fifc_candidate" - 2>/dev/null
                 else
                     _fifc_preview_file_default "$fifc_candidate"
                 end
-                rm -rf "$preview_dir"
             else if type -q pdftotext
                 _fifc_clear_graphics
                 pdftotext -l 10 -nopgbrk "$fifc_candidate" - 2>/dev/null
@@ -49,8 +56,17 @@ function _fifc_preview_file -d "Preview the selected file with the right tool de
             end
         case video
             if type -q ffmpegthumbnailer
-                set -l thumbnail (mktemp -t fifc-video-preview.XXXXXX.jpg)
-                ffmpegthumbnailer -i "$fifc_candidate" -o "$thumbnail" -s 0 -q 8 >/dev/null 2>&1
+                set -l thumbnail (_fifc_preview_cache_file "$fifc_candidate" video jpg)
+                if not test -f "$thumbnail"
+                    set -l temp_thumbnail (mktemp -t fifc-video-preview.XXXXXX.jpg)
+                    ffmpegthumbnailer -i "$fifc_candidate" -o "$temp_thumbnail" -s 0 -q 8 >/dev/null 2>&1
+                    if test -f "$temp_thumbnail"
+                        mv "$temp_thumbnail" "$thumbnail"
+                    else
+                        rm -f "$temp_thumbnail"
+                    end
+                end
+
                 if test -f "$thumbnail"; and _fifc_preview_graphic "$thumbnail"
                 else if type -q mediainfo
                     _fifc_clear_graphics
@@ -61,7 +77,6 @@ function _fifc_preview_file -d "Preview the selected file with the right tool de
                 else
                     _fifc_preview_file_default "$fifc_candidate"
                 end
-                rm -f "$thumbnail"
             else if type -q mediainfo
                 _fifc_clear_graphics
                 mediainfo "$fifc_candidate"

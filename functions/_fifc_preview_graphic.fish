@@ -26,9 +26,11 @@ function _fifc_preview_graphic -d "Preview media using the best terminal graphic
 
     if test $is_kitty_like -eq 1
         if type -q kitten
+            sleep 0.05
             _fifc_clear_graphics
             kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" "$file" | sed '$d' | sed 's/\[m$//'
         else if type -q chafa
+            sleep 0.05
             _fifc_clear_graphics
             chafa --clear --format kitty --passthrough=none --animate=off --size "$dim" "$file"
             echo
@@ -36,9 +38,11 @@ function _fifc_preview_graphic -d "Preview media using the best terminal graphic
             return 1
         end
     else if set -q SIXEL_SUPPORT; and test "$SIXEL_SUPPORT" = 1; and type -q chafa
+        sleep 0.05
         chafa --clear --format sixels --animate=off --size "$dim" "$file"
         echo
     else if type -q chafa
+        sleep 0.05
         chafa --clear --format symbols --animate=off --size "$dim" "$file"
         echo
     else
