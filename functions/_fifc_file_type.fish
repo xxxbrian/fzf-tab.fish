@@ -15,18 +15,17 @@ function _fifc_file_type -d "Figure out file type (txt, json, image, video, pdf,
         case "video/*"
             echo video
             return
+        case application/pdf
+            echo pdf
+            return
+        case application/json
+            echo json
+            return
     end
 
     if test $binary = 1
         echo binary
     else
-        switch $mime
-            case application/pdf
-                echo pdf
-            case application/json
-                echo json
-            case "*"
-                echo txt
-        end
+        echo txt
     end
 end
