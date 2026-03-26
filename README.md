@@ -51,6 +51,12 @@ By default fifc override `tab`, but you can assign another keybinding:
 set -U fifc_keybinding \cx
 ```
 
+To append custom fzf options globally, for example to disable the `--exact` flag and increase the fuzziness:
+
+```fish
+set -U fifc_custom_fzf_opts +e
+```
+
 fifc can use modern tools if available:
 
 | Prefer                                           | Fallback to | Used for                                  | Custom options     |

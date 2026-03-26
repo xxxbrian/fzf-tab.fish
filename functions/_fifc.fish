@@ -3,7 +3,7 @@ function _fifc
     set -l result
     set -Ux _fifc_extract_regex
     set -gx _fifc_complist_path (string join '' (mktemp) "_fifc")
-    set -gx _fifc_custom_fzf_opts
+    set -gx fifc_effective_fzf_opts $fifc_custom_fzf_opts
     set -gx fifc_extracted
     set -gx fifc_commandline
     set -gx fifc_token (commandline --current-token)
@@ -42,7 +42,7 @@ function _fifc
             --preview '_fifc_action preview {} {q}' \
             --bind='$fifc_open_keybinding:execute(_fifc_action open {} {q} &> /dev/tty)' \
             --query '$fifc_safe_query' \
-            $_fifc_custom_fzf_opts"
+            $fifc_effective_fzf_opts"
 
     set -l cmd (string join -- " | " $source_cmd $fzf_cmd)
     # We use eval hack because wrapping source command
@@ -82,8 +82,8 @@ function _fifc
     rm $_fifc_complist_path
     # Clean state
     set -e _fifc_extract_regex
-    set -e _fifc_custom_fzf_opts
     set -e _fifc_complist_path
+    set -e fifc_effective_fzf_opts
     set -e fifc_token
     set -e fifc_group
     set -e fifc_extracted
