@@ -1,6 +1,7 @@
 function _fifc_preview_graphic -d "Preview media using the best terminal graphics protocol available"
     set -l file "$argv[1]"
     set -l dim "$FZF_PREVIEW_COLUMNS"x"$FZF_PREVIEW_LINES"
+    set -l is_kitty_like 0
 
     if test "$dim" = x
         set dim (stty size </dev/tty | string split ' ' | awk '{ print $2 "x" $1 }')
@@ -15,20 +16,28 @@ function _fifc_preview_graphic -d "Preview media using the best terminal graphic
         end
     end
 
-    if begin; set -q KITTY_WINDOW_ID; or set -q GHOSTTY_RESOURCES_DIR; end
+    if set -q KITTY_WINDOW_ID
+        set is_kitty_like 1
+    else if set -q GHOSTTY_RESOURCES_DIR
+        set is_kitty_like 1
+    else if test "$TERM_PROGRAM" = ghostty
+        set is_kitty_like 1
+    end
+
+    if test $is_kitty_like -eq 1
         if type -q kitten
-            kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" "$file"
+            kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" "$file" | sed '$d' | sed 's/\[m$//'
         else if type -q chafa
-            chafa --clear --format kitty --passthrough=none --size "$dim" "$file"
+            chafa --clear --format symbols --animate=off --size "$dim" "$file"
             echo
         else
             return 1
         end
     else if set -q SIXEL_SUPPORT; and test "$SIXEL_SUPPORT" = 1; and type -q chafa
-        chafa --clear --format sixels --size "$dim" "$file"
+        chafa --clear --format sixels --animate=off --size "$dim" "$file"
         echo
     else if type -q chafa
-        chafa --clear --size "$dim" "$file"
+        chafa --clear --format symbols --animate=off --size "$dim" "$file"
         echo
     else
         return 1
