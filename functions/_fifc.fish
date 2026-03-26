@@ -36,10 +36,10 @@ function _fifc
             --exit-0 \
             --ansi \
             --tabstop=4 \
-            --multi \
             --reverse \
             --header '$header' \
             --preview '_fifc_action preview {} {q}' \
+            --bind='tab:down,btab:up' \
             --bind='$fifc_open_keybinding:execute(_fifc_action open {} {q} &> /dev/tty)' \
             --query '$fifc_safe_query' \
             $fifc_effective_fzf_opts"
