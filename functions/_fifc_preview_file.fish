@@ -2,13 +2,20 @@ function _fifc_preview_file -d "Preview the selected file with the right tool de
     set -l file_type (_fifc_file_type "$fifc_candidate")
 
     switch $file_type
+        case txt json archive binary
+            _fifc_clear_graphics
+    end
+
+    switch $file_type
         case txt
+            _fifc_clear_graphics
             if type -q bat
                 bat --color=always $fifc_bat_opts "$fifc_candidate"
             else
                 cat "$fifc_candidate"
             end
         case json
+            _fifc_clear_graphics
             if type -q bat
                 bat --color=always -l json $fifc_bat_opts "$fifc_candidate"
             else
@@ -28,12 +35,14 @@ function _fifc_preview_file -d "Preview the selected file with the right tool de
                 pdftoppm -f 1 -singlefile -png "$fifc_candidate" "$preview_base" >/dev/null 2>&1
                 if test -f "$preview_base.png"; and _fifc_preview_graphic "$preview_base.png"
                 else if type -q pdftotext
+                    _fifc_clear_graphics
                     pdftotext -l 10 -nopgbrk "$fifc_candidate" - 2>/dev/null
                 else
                     _fifc_preview_file_default "$fifc_candidate"
                 end
                 rm -rf "$preview_dir"
             else if type -q pdftotext
+                _fifc_clear_graphics
                 pdftotext -l 10 -nopgbrk "$fifc_candidate" - 2>/dev/null
             else
                 _fifc_preview_file_default "$fifc_candidate"
@@ -44,16 +53,20 @@ function _fifc_preview_file -d "Preview the selected file with the right tool de
                 ffmpegthumbnailer -i "$fifc_candidate" -o "$thumbnail" -s 0 -q 8 >/dev/null 2>&1
                 if test -f "$thumbnail"; and _fifc_preview_graphic "$thumbnail"
                 else if type -q mediainfo
+                    _fifc_clear_graphics
                     mediainfo "$fifc_candidate"
                 else if type -q exiftool
+                    _fifc_clear_graphics
                     exiftool "$fifc_candidate"
                 else
                     _fifc_preview_file_default "$fifc_candidate"
                 end
                 rm -f "$thumbnail"
             else if type -q mediainfo
+                _fifc_clear_graphics
                 mediainfo "$fifc_candidate"
             else if type -q exiftool
+                _fifc_clear_graphics
                 exiftool "$fifc_candidate"
             else
                 _fifc_preview_file_default "$fifc_candidate"
