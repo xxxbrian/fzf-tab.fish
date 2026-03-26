@@ -28,7 +28,7 @@ function _fifc_preview_graphic -d "Preview media using the best terminal graphic
         if type -q kitten
             kitten icat --clear --transfer-mode=memory --unicode-placeholder --stdin=no --place="$dim@0x0" "$file" | sed '$d' | sed 's/\[m$//'
         else if type -q chafa
-            chafa --clear --format symbols --animate=off --size "$dim" "$file"
+            chafa --clear --format kitty --passthrough=none --animate=off --size "$dim" "$file"
             echo
         else
             return 1
