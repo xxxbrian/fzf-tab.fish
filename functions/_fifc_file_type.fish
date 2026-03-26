@@ -1,4 +1,4 @@
-function _fifc_file_type -d "Figure out file type (txt, json, image, pdf, archive, binary)"
+function _fifc_file_type -d "Figure out file type (txt, json, image, video, pdf, archive, binary)"
     set -l mime (file --mime-type -b "$argv")
     set -l binary 0
     if string match --quiet '*binary*' -- (file --mime -b -L "$argv")
@@ -11,6 +11,9 @@ function _fifc_file_type -d "Figure out file type (txt, json, image, pdf, archiv
             return
         case "image/*"
             echo image
+            return
+        case "video/*"
+            echo video
             return
     end
 
