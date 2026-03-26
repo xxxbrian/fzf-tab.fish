@@ -1,4 +1,5 @@
 function _fifc_preview_fn -d "Preview the function definition"
+    _fifc_clear_graphics
     if type -q bat
         type $fifc_candidate | bat --color=always --language fish $fifc_bat_opts
     else
